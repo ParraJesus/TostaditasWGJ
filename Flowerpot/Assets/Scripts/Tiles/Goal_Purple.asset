@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 692ff9c7e95448645b3d2976bdf7741c, type: 3}
   m_Name: Goal_Purple
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 563088813, guid: 8bc888530ae06a84a9f7053f9db9a8c0, type: 3}
+  m_Sprite: {fileID: -493088520, guid: f288b4b3da12f0242bc7195f0b6109c3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -36,3 +36,10 @@ MonoBehaviour:
   m_ColliderType: 2
   tileType: 3
   tileColor: 3
+  isAnimated: 1
+  animationFrames:
+  - {fileID: -1693988017, guid: f288b4b3da12f0242bc7195f0b6109c3, type: 3}
+  - {fileID: -493088520, guid: f288b4b3da12f0242bc7195f0b6109c3, type: 3}
+  - {fileID: -439851856, guid: f288b4b3da12f0242bc7195f0b6109c3, type: 3}
+  - {fileID: 692733579, guid: f288b4b3da12f0242bc7195f0b6109c3, type: 3}
+  animationSpeed: 2.5

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using static TileData;
+using UnityEngine.SceneManagement;
 
 public class PlayerTileInteraction : MonoBehaviour
 {
@@ -78,26 +79,22 @@ public class PlayerTileInteraction : MonoBehaviour
     {
         Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);
         TileData floorTile = groundTilemap.GetTile<TileData>(cellPos);
+        TileData goalTile = goalTilemap.GetTile<TileData>(cellPos);
 
-        // DEBUG: Mostrar información del tile actual
-        if (floorTile != null)
+        if (goalTile != null && goalTile.tileType == TileType.Goal)
         {
-            Debug.Log($"Tile actual: Tipo={floorTile.tileType}, Color={floorTile.tileColor}, CurrentColor={currentColor}");
+            playerSounds.PlayNextLevel();
+            LoadNextLevel();
         }
 
         if (floorTile != null && floorTile.tileType == TileType.ColorChange && floorTile.tileColor != currentColor)
         {
-            // Guardar color anterior para referencia
-            TileColor previousColor = currentColor;
             currentColor = floorTile.tileColor;
-
-            Debug.Log($"DETECTADO: Cambio de color de {previousColor} a {currentColor}");
 
             int index = (int)currentColor;
             if (index >= 0 && index < colorSprites.Count && colorSprites[index] != null)
             {
                 playerSprite.sprite = colorSprites[index];
-                Debug.Log("Se ha cambiado de color a " + currentColor);
             }
 
             // Actualizar paredes y objetivos
@@ -115,26 +112,12 @@ public class PlayerTileInteraction : MonoBehaviour
                 
                 // Reproducir sonido de flores cuando se activa cualquier color
                 playerSounds.PlayFlores();
-                Debug.Log($"Sonido de flores: Color {currentColor} activado");
-            }
-        }
-        
-        // TEST MANUAL: Presiona T para probar sonido de flores
-        // CAMBIO: Solo esta línea fue modificada para usar el nuevo Input System
-        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            Debug.Log("=== TEST MANUAL SONIDO FLORES ===");
-            if (playerSounds != null)
-            {
-                playerSounds.PlayFlores();
             }
         }
     }
 
     private void UpdateAllWalls()
     {
-        int wallsUnlocked = 0;
-        
         foreach (var kvp in wallTiles)
         {
             Vector3Int pos = kvp.Key;
@@ -143,48 +126,23 @@ public class PlayerTileInteraction : MonoBehaviour
             bool wasVisible = collisionTilemap.HasTile(pos);
             bool visible = tile.tileColor != currentColor;
             
-            // Contar paredes que se desbloquean (se vuelven invisibles)
-            if (wasVisible && !visible && tile.tileColor == currentColor)
-            {
-                wallsUnlocked++;
-            }
-            
             UpdateTileVisibility(pos, visible);
-        }
-        
-        // Si se desbloquearon paredes, mostrar debug
-        if (wallsUnlocked > 0)
-        {
-            Debug.Log($"PlayerTileInteraction: {wallsUnlocked} paredes {currentColor} desbloqueadas");
         }
     }
 
     private void UpdateAllGoals()
     {
-        int goalsActivated = 0;
-        
         foreach (var kvp in GoalTiles)
         {
             Vector3Int pos = kvp.Key;
             TileData tile = kvp.Value;
 
-            bool wasVisible = goalTilemap.HasTile(pos);
             bool visible = (tile.tileColor == TileColor.None) || (tile.tileColor == currentColor);
             
-            // Contar objetivos que se activan
-            if (!wasVisible && visible && tile.tileColor == currentColor)
-            {
-                goalsActivated++;
-            }
             
             UpdateGoalVisibility(pos, visible);
         }
         
-        // Si se activaron objetivos, mostrar debug
-        if (goalsActivated > 0)
-        {
-            Debug.Log($"PlayerTileInteraction: {goalsActivated} objetivos {currentColor} activados");
-        }
     }
 
     private void UpdateGoalVisibility(Vector3Int pos, bool visible)
@@ -210,7 +168,13 @@ public class PlayerTileInteraction : MonoBehaviour
             collisionTilemap.SetTile(pos, null);
         }
     }
-    
+
+    private void LoadNextLevel()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex + 1);
+    }
+
     // Propiedades públicas para acceder al estado (si es necesario)
     public TileColor CurrentColor => currentColor;
 }

@@ -10,10 +10,12 @@ public class PlayerSounds : MonoBehaviour
     [Header("Sound Effects")]
     [SerializeField] private AudioClip desplazamientoSound; // Sonido de movimiento
     [SerializeField] private AudioClip floresSound;         // Sonido de cambio de color/flores
-    
+    [SerializeField] private AudioClip nextLevelSound;         // Sonido de pasar de nivel
+
     [Header("Audio Settings")]
     [SerializeField] private float desplazamientoVolume = 1f;
     [SerializeField] private float floresVolume = 1f;
+    [SerializeField] private float nextLevelVolume = 1f;
     [SerializeField] private float movementCooldown = 0.2f; // Para evitar spam del sonido
     
     [Header("Debug")]
@@ -112,12 +114,6 @@ public class PlayerSounds : MonoBehaviour
         Debug.Log($"AudioSource configurado - Mute: {audioSource.mute}, Volume: {audioSource.volume}");
     }
     
-    void Update()
-    {
-        // Ya no necesitamos detectar cambios de color aquí
-        // PlayerTileInteraction se encarga de llamar PlayFlores() directamente
-    }
-    
     /// <summary>
     /// Se ejecuta cuando se detecta input de movimiento
     /// </summary>
@@ -129,11 +125,6 @@ public class PlayerSounds : MonoBehaviour
         {
             PlayDesplazamientoSound();
             lastMovementSoundTime = Time.time;
-            
-            if (debugMode)
-            {
-                Debug.Log($"PlayerSounds: Input de movimiento detectado: {movement}");
-            }
         }
     }
     
@@ -170,43 +161,10 @@ public class PlayerSounds : MonoBehaviour
     /// </summary>
     private void PlayFloresSound()
     {
-        Debug.Log("=== INTENT REPRODUCIR SONIDO DE FLORES ===");
-        
-        if (floresSound == null)
-        {
-            Debug.LogError("PlayerSounds: floresSound es NULL! Asigna un AudioClip en el inspector.");
-            return;
-        }
-        
-        if (audioSource == null)
-        {
-            Debug.LogError("PlayerSounds: audioSource es NULL!");
-            return;
-        }
-        
-        // Verificar si el AudioSource está en otro GameObject
-        if (audioSource.gameObject != this.gameObject)
-        {
-            Debug.LogWarning($"AudioSource está en {audioSource.gameObject.name}, no en {this.gameObject.name}");
-        }
-        
-        Debug.Log($"GameObject actual: {this.gameObject.name}");
-        Debug.Log($"AudioSource en: {audioSource.gameObject.name}");
-        Debug.Log($"AudioSource activo: {audioSource.gameObject.activeInHierarchy}");
-        Debug.Log($"AudioSource enabled: {audioSource.enabled}");
-        Debug.Log($"AudioSource mute: {audioSource.mute}");
-        Debug.Log($"AudioSource volume: {audioSource.volume}");
-        Debug.Log($"floresVolume: {floresVolume}");
-        Debug.Log($"AudioClip nombre: {floresSound.name}");
-        Debug.Log($"AudioClip length: {floresSound.length} segundos");
-        
-        // Intentar reproducir el sonido
         try
         {
             audioSource.PlayOneShot(floresSound, floresVolume);
-            Debug.Log("PlayerSounds: ¡¡¡ COMANDO PlayOneShot EJECUTADO !!!");
             
-            // Verificar si realmente está reproduciendo
             if (audioSource.isPlaying)
             {
                 Debug.Log("AudioSource confirmado: ESTÁ REPRODUCIENDO");
@@ -221,9 +179,17 @@ public class PlayerSounds : MonoBehaviour
             Debug.LogError($"Error al reproducir sonido: {e.Message}");
         }
     }
-    
+
+    private void PlayNextLevelSound()
+    {
+        if (desplazamientoSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(nextLevelSound, nextLevelVolume);
+        }
+    }
+
     #region Public Methods (para llamar desde otros scripts si es necesario)
-    
+
     /// <summary>
     /// Método público para reproducir sonido de desplazamiento
     /// </summary>
@@ -247,7 +213,12 @@ public class PlayerSounds : MonoBehaviour
     {
         desplazamientoVolume = Mathf.Clamp01(volume);
     }
-    
+
+    public void PlayNextLevel()
+    {
+        PlayNextLevelSound();
+    }
+
     /// <summary>
     /// Cambiar volumen del sonido de flores
     /// </summary>

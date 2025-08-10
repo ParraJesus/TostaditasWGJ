@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,8 +14,8 @@ public class PlayerController : MonoBehaviour
     {
         controls = new PlayerMovement();
         
-        // Configurar los eventos aquí en lugar de en Start()
         controls.Main.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
+        controls.Main.Reload.performed += ctx => ReloadScene();
     }
 
     private void OnEnable()
@@ -44,12 +45,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        // Ya no necesitamos configurar eventos aquí
-        // Se movieron a Awake()
-    }
-
     private void Move(Vector2 direction)
     {
         if (CanMove(direction))
@@ -68,8 +63,8 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    void Update()
-    {
-        
+    private void ReloadScene() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
     }
 }
