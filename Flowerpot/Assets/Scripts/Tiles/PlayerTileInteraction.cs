@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -21,11 +22,15 @@ public class PlayerTileInteraction : MonoBehaviour
     [SerializeField]
     private TileColor currentColor = TileColor.None;
 
+    [Header("Audio Settings")]
+    [SerializeField] private float delayBeforeNextLevel = 1.5f; // Tiempo para escuchar el sonido de victoria
+
     private Dictionary<Vector3Int, TileData> wallTiles = new Dictionary<Vector3Int, TileData>();
     private Dictionary<Vector3Int, TileData> GoalTiles = new Dictionary<Vector3Int, TileData>();
     
     // Referencia al sistema de sonidos
     private PlayerSounds playerSounds;
+    private bool levelCompleted = false; // Para evitar múltiples activaciones
 
     private void Start()
     {
@@ -77,16 +82,29 @@ public class PlayerTileInteraction : MonoBehaviour
 
     private void Update()
     {
+        // Si el nivel ya se completó, no hacer nada más
+        if (levelCompleted) return;
+
         Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);
         TileData floorTile = groundTilemap.GetTile<TileData>(cellPos);
         TileData goalTile = goalTilemap.GetTile<TileData>(cellPos);
 
+        // Verificar si llegó a la meta
         if (goalTile != null && goalTile.tileType == TileType.Goal)
         {
-            playerSounds.PlayNextLevel();
-            LoadNextLevel();
+            levelCompleted = true; // Marcar nivel como completado
+            
+            // Reproducir sonido de victoria
+            if (playerSounds != null)
+            {
+                playerSounds.PlayNextLevel();
+            }
+            
+            // Cargar siguiente nivel con delay
+            StartCoroutine(LoadNextLevelWithDelay());
         }
 
+        // Verificar cambio de color
         if (floorTile != null && floorTile.tileType == TileType.ColorChange && floorTile.tileColor != currentColor)
         {
             currentColor = floorTile.tileColor;
@@ -101,19 +119,29 @@ public class PlayerTileInteraction : MonoBehaviour
             UpdateAllWalls();
             UpdateAllGoals();
             
-            // DEBUG: Verificar si playerSounds existe
-            if (playerSounds == null)
+            // Reproducir sonido de flores cuando se activa cualquier color
+            if (playerSounds != null)
             {
-                Debug.LogError("PlayerSounds es NULL! No se puede reproducir sonido.");
+                Debug.Log("PlayerTileInteraction: Reproduciendo sonido de flores...");
+                playerSounds.PlayFlores();
             }
             else
             {
-                Debug.Log("PlayerSounds encontrado, intentando reproducir sonido...");
-                
-                // Reproducir sonido de flores cuando se activa cualquier color
-                playerSounds.PlayFlores();
+                Debug.LogError("PlayerTileInteraction: PlayerSounds es NULL! No se puede reproducir sonido.");
             }
         }
+    }
+
+    /// <summary>
+    /// Cargar el siguiente nivel con un pequeño delay para escuchar los sonidos
+    /// </summary>
+    private IEnumerator LoadNextLevelWithDelay()
+    {
+        Debug.Log($"PlayerTileInteraction: Nivel completado! Cargando siguiente nivel en {delayBeforeNextLevel} segundos...");
+        
+        yield return new WaitForSeconds(delayBeforeNextLevel);
+        
+        LoadNextLevel();
     }
 
     private void UpdateAllWalls()
@@ -139,10 +167,8 @@ public class PlayerTileInteraction : MonoBehaviour
 
             bool visible = (tile.tileColor == TileColor.None) || (tile.tileColor == currentColor);
             
-            
             UpdateGoalVisibility(pos, visible);
         }
-        
     }
 
     private void UpdateGoalVisibility(Vector3Int pos, bool visible)
@@ -172,7 +198,20 @@ public class PlayerTileInteraction : MonoBehaviour
     private void LoadNextLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex + 1);
+        int nextSceneIndex = currentSceneIndex + 1;
+        
+        // Verificar si existe el siguiente nivel
+        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            Debug.Log($"PlayerTileInteraction: Cargando nivel {nextSceneIndex}");
+            SceneManager.LoadScene(nextSceneIndex);
+        }
+        else
+        {
+            Debug.Log("PlayerTileInteraction: ¡Juego completado! No hay más niveles.");
+            // Aquí puedes cargar una escena de victoria o volver al menú principal
+            SceneManager.LoadScene(0); // Volver al menú principal
+        }
     }
 
     // Propiedades públicas para acceder al estado (si es necesario)

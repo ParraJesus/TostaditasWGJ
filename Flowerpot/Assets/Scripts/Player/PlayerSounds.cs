@@ -10,7 +10,7 @@ public class PlayerSounds : MonoBehaviour
     [Header("Sound Effects")]
     [SerializeField] private AudioClip desplazamientoSound; // Sonido de movimiento
     [SerializeField] private AudioClip floresSound;         // Sonido de cambio de color/flores
-    [SerializeField] private AudioClip nextLevelSound;         // Sonido de pasar de nivel
+    [SerializeField] private AudioClip nextLevelSound;     // Sonido de pasar de nivel
 
     [Header("Audio Settings")]
     [SerializeField] private float desplazamientoVolume = 1f;
@@ -61,7 +61,7 @@ public class PlayerSounds : MonoBehaviour
         
         if (debugMode)
         {
-            Debug.Log("PlayerSounds: Sistema de sonidos inicializado - Desplazamiento y Flores");
+            Debug.Log("PlayerSounds: Sistema de sonidos inicializado - Desplazamiento, Flores y Victoria");
         }
     }
     
@@ -161,34 +161,42 @@ public class PlayerSounds : MonoBehaviour
     /// </summary>
     private void PlayFloresSound()
     {
-        try
+        if (floresSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(floresSound, floresVolume);
             
-            if (audioSource.isPlaying)
+            if (debugMode)
             {
-                Debug.Log("AudioSource confirmado: ESTÁ REPRODUCIENDO");
-            }
-            else
-            {
-                Debug.LogWarning("AudioSource NO está reproduciendo después de PlayOneShot");
+                Debug.Log("PlayerSounds: Sonido de flores reproducido");
             }
         }
-        catch (System.Exception e)
+        else if (debugMode)
         {
-            Debug.LogError($"Error al reproducir sonido: {e.Message}");
+            Debug.LogWarning("PlayerSounds: floresSound no está asignado");
         }
     }
 
+    /// <summary>
+    /// Reproduce el sonido de pasar de nivel
+    /// </summary>
     private void PlayNextLevelSound()
     {
-        if (desplazamientoSound != null && audioSource != null)
+        if (nextLevelSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(nextLevelSound, nextLevelVolume);
+            
+            if (debugMode)
+            {
+                Debug.Log("PlayerSounds: Sonido de siguiente nivel reproducido");
+            }
+        }
+        else if (debugMode)
+        {
+            Debug.LogWarning("PlayerSounds: nextLevelSound no está asignado");
         }
     }
 
-    #region Public Methods (para llamar desde otros scripts si es necesario)
+    #region Public Methods (para llamar desde otros scripts)
 
     /// <summary>
     /// Método público para reproducir sonido de desplazamiento
@@ -207,16 +215,19 @@ public class PlayerSounds : MonoBehaviour
     }
     
     /// <summary>
+    /// Método público para reproducir sonido de siguiente nivel
+    /// </summary>
+    public void PlayNextLevel()
+    {
+        PlayNextLevelSound();
+    }
+    
+    /// <summary>
     /// Cambiar volumen del sonido de desplazamiento
     /// </summary>
     public void SetDesplazamientoVolume(float volume)
     {
         desplazamientoVolume = Mathf.Clamp01(volume);
-    }
-
-    public void PlayNextLevel()
-    {
-        PlayNextLevelSound();
     }
 
     /// <summary>
@@ -225,6 +236,14 @@ public class PlayerSounds : MonoBehaviour
     public void SetFloresVolume(float volume)
     {
         floresVolume = Mathf.Clamp01(volume);
+    }
+    
+    /// <summary>
+    /// Cambiar volumen del sonido de siguiente nivel
+    /// </summary>
+    public void SetNextLevelVolume(float volume)
+    {
+        nextLevelVolume = Mathf.Clamp01(volume);
     }
     
     #endregion
@@ -241,6 +260,12 @@ public class PlayerSounds : MonoBehaviour
     public void TestFloresSound()
     {
         PlayFloresSound();
+    }
+    
+    [ContextMenu("Test Next Level Sound")]
+    public void TestNextLevelSound()
+    {
+        PlayNextLevelSound();
     }
     
     #endregion
