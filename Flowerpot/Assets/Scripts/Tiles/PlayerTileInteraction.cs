@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.InputSystem;
 using static TileData;
 
 public class PlayerTileInteraction : MonoBehaviour
@@ -119,7 +120,8 @@ public class PlayerTileInteraction : MonoBehaviour
         }
         
         // TEST MANUAL: Presiona T para probar sonido de flores
-        if (Input.GetKeyDown(KeyCode.T))
+        // CAMBIO: Solo esta línea fue modificada para usar el nuevo Input System
+        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
         {
             Debug.Log("=== TEST MANUAL SONIDO FLORES ===");
             if (playerSounds != null)

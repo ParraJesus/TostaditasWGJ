@@ -31,11 +31,26 @@ public class PlayerSounds : MonoBehaviour
         // Configurar AudioSource
         SetupAudioSource();
         
-        // Obtener referencias
+        // Buscar PlayerTileInteraction en el mismo GameObject primero
         tileInteraction = GetComponent<PlayerTileInteraction>();
+        
+        // Si no está en el mismo GameObject, buscar en toda la escena
         if (tileInteraction == null)
         {
-            Debug.LogError("PlayerSounds: No se encontró PlayerTileInteraction en este GameObject");
+            tileInteraction = FindObjectOfType<PlayerTileInteraction>();
+            if (tileInteraction != null)
+            {
+                Debug.LogWarning($"PlayerSounds: PlayerTileInteraction encontrado en {tileInteraction.gameObject.name} (no en el mismo GameObject)");
+            }
+        }
+        
+        if (tileInteraction == null)
+        {
+            Debug.LogError("PlayerSounds: NO se encontró PlayerTileInteraction en ningún lugar de la escena!");
+        }
+        else
+        {
+            Debug.Log($"PlayerSounds: PlayerTileInteraction configurado correctamente en {tileInteraction.gameObject.name}");
         }
         
         // Inicializar controles para detectar input

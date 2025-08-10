@@ -9,39 +9,67 @@ public class PlayerController : MonoBehaviour
     private Tilemap collisionTilemap;
     private PlayerMovement controls;
 
-    private void Awake(){
+    private void Awake()
+    {
         controls = new PlayerMovement();
-    }
-
-    private void OnEnable(){
-        controls.Enable();
-    }
-
-    private void OnDisable(){
-        controls.Disable();
-    }
-
-    void Start(){
+        
+        // Configurar los eventos aquí en lugar de en Start()
         controls.Main.Movement.performed += ctx => Move(ctx.ReadValue<Vector2>());
     }
 
-    private void Move(Vector2 direction){
+    private void OnEnable()
+    {
+        // Verificar que controls no sea null antes de habilitarlo
+        if (controls != null)
+        {
+            controls.Enable();
+        }
+    }
+
+    private void OnDisable()
+    {
+        // Verificar que controls no sea null antes de deshabilitarlo
+        if (controls != null)
+        {
+            controls.Disable();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Limpiar recursos del Input System
+        if (controls != null)
+        {
+            controls.Dispose();
+        }
+    }
+
+    void Start()
+    {
+        // Ya no necesitamos configurar eventos aquí
+        // Se movieron a Awake()
+    }
+
+    private void Move(Vector2 direction)
+    {
         if (CanMove(direction))
         {
             transform.position += (Vector3)direction;
         }
     }
 
-    private bool CanMove(Vector2 direction) {
+    private bool CanMove(Vector2 direction) 
+    {
         Vector3Int gridPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
-        if(!groundTilemap.HasTile(gridPosition) || collisionTilemap.HasTile(gridPosition))
+        if (!groundTilemap.HasTile(gridPosition) || collisionTilemap.HasTile(gridPosition))
         {
             return false;
         }
         return true;
     }
 
-    void Update(){
+    void Update()
+    {
         
     }
 }
