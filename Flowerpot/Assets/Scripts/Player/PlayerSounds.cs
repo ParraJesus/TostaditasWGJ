@@ -14,8 +14,8 @@ public class PlayerSounds : MonoBehaviour
 
     [Header("Audio Settings")]
     [SerializeField] private float desplazamientoVolume = 1f;
-    [SerializeField] private float floresVolume = 1f;
-    [SerializeField] private float nextLevelVolume = 1f;
+    [SerializeField] private float floresVolume = 0.2f;
+    [SerializeField] private float nextLevelVolume = 0.3f;
     [SerializeField] private float movementCooldown = 0.2f; // Para evitar spam del sonido
     
     [Header("Debug")]

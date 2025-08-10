@@ -23,7 +23,7 @@ public class PlayerTileInteraction : MonoBehaviour
     private TileColor currentColor = TileColor.None;
 
     [Header("Audio Settings")]
-    [SerializeField] private float delayBeforeNextLevel = 1.5f; // Tiempo para escuchar el sonido de victoria
+    [SerializeField] private float delayBeforeNextLevel = 0.2f; // Tiempo para escuchar el sonido de victoria
 
     private Dictionary<Vector3Int, TileData> wallTiles = new Dictionary<Vector3Int, TileData>();
     private Dictionary<Vector3Int, TileData> GoalTiles = new Dictionary<Vector3Int, TileData>();
@@ -195,6 +195,7 @@ public class PlayerTileInteraction : MonoBehaviour
         }
     }
 
+    /*
     private void LoadNextLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
@@ -211,6 +212,24 @@ public class PlayerTileInteraction : MonoBehaviour
             Debug.Log("PlayerTileInteraction: ¡Juego completado! No hay más niveles.");
             // Aquí puedes cargar una escena de victoria o volver al menú principal
             SceneManager.LoadScene(0); // Volver al menú principal
+        }
+    }
+    */
+
+    private void LoadNextLevel()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+
+        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            Debug.Log($"PlayerTileInteraction: Preparando carga del nivel {nextSceneIndex}");
+            FindObjectOfType<LevelLoader>().LoadLevel(nextSceneIndex);
+        }
+        else
+        {
+            Debug.Log("PlayerTileInteraction: ¡Juego completado!");
+            FindObjectOfType<LevelLoader>().LoadLevel(0); // Menú principal
         }
     }
 
