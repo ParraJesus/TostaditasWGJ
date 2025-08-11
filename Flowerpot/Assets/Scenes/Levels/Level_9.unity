@@ -1427,7 +1427,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 331e2e1c4aeb9ba4884bcbcd80142e9c, type: 3}
   - {fileID: 21300000, guid: f1dfaacbafda0024cbf50252d9c937b2, type: 3}
   currentColor: 0
-  delayBeforeNextLevel: 1.5
+  delayBeforeNextLevel: 0.2
 --- !u!1 &386431367
 GameObject:
   m_ObjectHideFlags: 0

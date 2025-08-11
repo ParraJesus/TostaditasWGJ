@@ -1795,7 +1795,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 331e2e1c4aeb9ba4884bcbcd80142e9c, type: 3}
   - {fileID: 21300000, guid: f1dfaacbafda0024cbf50252d9c937b2, type: 3}
   currentColor: 0
-  delayBeforeNextLevel: 1.5
+  delayBeforeNextLevel: 0.2
 --- !u!1 &386431367
 GameObject:
   m_ObjectHideFlags: 0
@@ -1952,7 +1952,7 @@ MonoBehaviour:
   floresSound: {fileID: 8300000, guid: c3d4432b763f3a746ac5f5668b861e20, type: 3}
   nextLevelSound: {fileID: 8300000, guid: 71d9a8f132a294f4980a46ee7539d494, type: 3}
   desplazamientoVolume: 1
-  floresVolume: 1
+  floresVolume: 0.2
   nextLevelVolume: 1
   movementCooldown: 0.2
   debugMode: 1
